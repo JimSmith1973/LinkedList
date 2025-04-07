@@ -2,8 +2,9 @@
 
 #include "LinkedListClass.h"
 
-Node::Node( int nValue )
+Node::Node( LPARAM lIdentifier, int nValue )
 {
+	m_lIdentifier	= lIdentifier;
 	m_nData			= nValue;
 	m_lpNextNode	= NULL;
 
@@ -14,11 +15,14 @@ LinkedList::LinkedList()
 	// Clear head node
 	m_lpHeadNode = NULL;
 
+	// Initialise next identifier value
+	m_lNextIdentifier = 0;
+
 } // End of function LinkedList::LinkedList
 
 LinkedList::~LinkedList()
 {
-	Node *lpWhichNode;
+	LPNODE lpWhichNode;
 
 	// Loop while head node exists
 	while( m_lpHeadNode )
@@ -39,7 +43,7 @@ LinkedList::~LinkedList()
 void LinkedList::AddNode( int value )
 {
 	// Create new node
-	Node* lpNewNode = new Node( value );
+	Node* lpNewNode = new Node( m_lNextIdentifier, value );
 
 	// See if list is empty
 	if( m_lpHeadNode == NULL )
@@ -55,7 +59,7 @@ void LinkedList::AddNode( int value )
 		// List is not empty
 
 		// Get first node
-		Node *lpWhichNode = m_lpHeadNode;
+		LPNODE lpWhichNode = m_lpHeadNode;
 
 		// Loop through all nodes
 		while( lpWhichNode->m_lpNextNode != NULL )
@@ -70,77 +74,88 @@ void LinkedList::AddNode( int value )
 
 	} // End of list is not empty
 
-} // End of finction LinkedList::AddNode
+	// Undate next identifier
+	m_lNextIdentifier ++;
 
-void LinkedList::DeleteNodeWithValue( int value )
+} // End of function LinkedList::AddNode
+
+void LinkedList::DeleteNode( LPARAM lIdentifier )
 {
+	// Note that we can't just 'get' the node and delete it, as we need to update the previous node
+	// to avoid the deleted one
+
 	// Ensure that list is not empty
 	if( m_lpHeadNode )
 	{
 		// List is not empty
 
-		// See if head node has the required value
-		if( m_lpHeadNode->m_nData == value )
+		// See if head node has the required identifier
+		if( m_lpHeadNode->m_lIdentifier == lIdentifier )
 		{
-			// Head node has the required value
+			// Head node has the required identifier
 
-			// Store head node
-			Node *lpWhichNode = m_lpHeadNode;
+			// Copy head node into temporary
+			LPNODE lpTempNode = m_lpHeadNode;
 
-			// Move head to next node
+			// Move head node to next item
 			m_lpHeadNode = m_lpHeadNode->m_lpNextNode;
 
-			// Delete stored head node
-			delete lpWhichNode;
+			// Free memory
+			delete lpTempNode;
 
-		} // End of head node has the required value
+		} // End of head node has the required identifier
 		else
 		{
-			// Head node does not have the required value
+			// Head node does not have the required identifier
 
-			// Get first node
-			Node *lpWhichNode = m_lpHeadNode;
+			// Copy head node into temporary
+			LPNODE lpTempNode = m_lpHeadNode;
 
-			// Loop through all nodes
-			while( lpWhichNode->m_lpNextNode && lpWhichNode->m_lpNextNode->m_nData != value )
+			// Find node to delete
+			while( lpTempNode->m_lpNextNode && lpTempNode->m_lpNextNode->m_lIdentifier != lIdentifier )
 			{
 				// Get next node
-				lpWhichNode = lpWhichNode->m_lpNextNode;
+				lpTempNode = lpTempNode->m_lpNextNode;
 
-			}; // End of loop through all nodes
+			}; // End of loop to find node to delete
 
-			// Ensure that next node is valid
-			if( lpWhichNode->m_lpNextNode )
+			// Note that temp node is the node before the one to delete
+
+			// Ensure that node to delete was found
+			if( lpTempNode->m_lpNextNode )
 			{
-				// Next node is valid
+				// Successfully found node to delete
 
 				// Store node to delete
-				Node *lpNodeToDelete = lpWhichNode->m_lpNextNode;
+				LPNODE lpNodeToDelete = lpTempNode->m_lpNextNode;
 
 				// Unlink node
-				lpWhichNode->m_lpNextNode = lpWhichNode->m_lpNextNode->m_lpNextNode;
+				lpTempNode->m_lpNextNode = lpTempNode->m_lpNextNode->m_lpNextNode;
 
-				// Delete node
-				delete lpNodeToDelete ;
+				// Free memory of deleted node
+				delete lpNodeToDelete;
 
-			} // End of next node is valid
+			} // End of successfully found node to delete
 
-		} // End of head node does not have the required value
+		} // End of head node does not have the required identifier
 
 	} // End of list is not empty
 
-} // End of function LinkedList::DeleteNodeWithValue
+} // End of function LinkedList::DeleteNode
 
 void LinkedList::Display()
 {
 	// Get first node
-	Node *lpWhichNode = m_lpHeadNode;
+	LPNODE lpWhichNode = m_lpHeadNode;
+
+	// Identify start of linked list
+	printf( "Start of Linked List:\r\n" );
 
 	// Loop through all nodes
 	while( lpWhichNode != NULL )
 	{
 		// Print node
-		printf( "%d->", lpWhichNode->m_nData );
+		printf( "Node %lld, data %d\r\n", lpWhichNode->m_lIdentifier, lpWhichNode->m_nData );
 
 		// Get next node
 		lpWhichNode = lpWhichNode->m_lpNextNode;
@@ -150,5 +165,67 @@ void LinkedList::Display()
 	// Print last node
 	printf( "NULL\r\n" );
 
+	// Identify end of linked list
+	printf( "End of Linked List.\r\n" );
+
 } // End of function LinkedList::Display
 
+LPNODE LinkedList::GetNode( LPARAM lIdentifier )
+{
+	LPNODE lpNode = NULL;
+
+	// Get first node
+	LPNODE lpWhichNode = m_lpHeadNode;
+
+	// Loop through all nodes
+	while( lpWhichNode )
+	{
+		// See if this is the required node
+		if( lpWhichNode->m_lIdentifier == lIdentifier )
+		{
+			// This is the required node
+
+			// Update return value
+			lpNode = lpWhichNode;
+
+			// Force exit from loop
+			lpWhichNode = NULL;
+
+		} // End of this is the required node
+		else
+		{
+			// This is not the required node
+
+			// Get next node
+			lpWhichNode = lpWhichNode->m_lpNextNode;
+
+		} // End of this is not the required node
+
+	}; // End of loop through all nodes
+
+	return lpNode;
+
+} // End of function LinkedList::GetNode
+
+int LinkedList::Integer( LPARAM lIdentifier )
+{
+	int nResult = 0;
+
+	LPNODE lpNode;
+
+	// Get node
+	lpNode = GetNode( lIdentifier );
+
+	// Ensure that node was goto
+	if( lpNode )
+	{
+		// Successfully got node
+
+		// Update return value
+		nResult = lpNode->m_nData;
+
+	} // End of successfully got node
+
+	return nResult;
+
+} // End of function LinkedList::Integer

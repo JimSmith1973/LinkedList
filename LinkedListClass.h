@@ -5,15 +5,17 @@
 #include <windows.h>
 #include <stdio.h>
 
-class Node
+typedef class Node
 {
 public:
-	Node( int nValue );
+	Node( LPARAM lIdentifier, int nValue );
 
+public:
+	LPARAM m_lIdentifier;
 	int m_nData;
 	Node *m_lpNextNode;
 
-}; // End of class Node
+} NODE, *LPNODE; // End of class Node
 
 class LinkedList
 {
@@ -24,11 +26,16 @@ public:
 
 	void AddNode( int value );
 
-	void DeleteNodeWithValue( int value );
+	void DeleteNode( LPARAM lIdentifier );
 
 	void Display();
 
+	LPNODE GetNode( LPARAM lIdentifier );
+
+	int Integer( LPARAM lIdentifier );
+
 private:
 	Node* m_lpHeadNode;
+	LPARAM m_lNextIdentifier;
 
 }; // End of class LinkedList

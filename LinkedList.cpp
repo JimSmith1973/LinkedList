@@ -12,14 +12,13 @@ int main()
 	list.AddNode( 30 );
 
 	// Display list
-	printf( "Linked List: " );
 	list.Display();
 
 	// Delete node from list
-	list.DeleteNodeWithValue(20);
+	list.DeleteNode( 2 );
 
 	// Display list
-	printf( "After Deleting 20: " );
+	printf( "\r\nAfter Deleting Node: \r\n\r\n" );
 	list.Display();
 
 	return 0;
