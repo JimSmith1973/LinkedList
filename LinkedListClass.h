@@ -8,12 +8,22 @@
 typedef class Node
 {
 public:
+	int GetData();
+
+	LPARAM GetIdentifier();
+
+	Node *GetNextNode();
+
 	Node( LPARAM lIdentifier, int nValue );
 
+	void SetNextNode( Node *lpNextNode );
+
 public:
+
+private:
 	LPARAM m_lIdentifier;
-	int m_nData;
 	Node *m_lpNextNode;
+	int m_nData;
 
 } NODE, *LPNODE; // End of class Node
 

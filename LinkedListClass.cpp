@@ -2,6 +2,27 @@
 
 #include "LinkedListClass.h"
 
+int Node::GetData()
+{
+	// Get data
+	return m_nData;
+
+} // End of function Node::GetData
+
+LPARAM Node::GetIdentifier()
+{
+	// Get identifier
+	return m_lIdentifier;
+
+} // End of function Node::GetIdentifier
+
+LPNODE Node::GetNextNode()
+{
+	// Get next node
+	return m_lpNextNode;
+
+} // End of function Node::GetNextNode
+
 Node::Node( LPARAM lIdentifier, int nValue )
 {
 	m_lIdentifier	= lIdentifier;
@@ -9,6 +30,13 @@ Node::Node( LPARAM lIdentifier, int nValue )
 	m_lpNextNode	= NULL;
 
 } // End of function Node::Node
+
+void Node::SetNextNode( Node *lpNextNode )
+{
+	// Set next node
+	m_lpNextNode = lpNextNode;
+
+} // End of function Node::SetNextNode
 
 LinkedList::LinkedList()
 {
@@ -31,7 +59,7 @@ LinkedList::~LinkedList()
 		lpWhichNode = m_lpHeadNode;
 
 		// Advance head node to next
-		m_lpHeadNode = m_lpHeadNode->m_lpNextNode;
+		m_lpHeadNode = m_lpHeadNode->GetNextNode();
 
 		// Delete stored head node
 		delete lpWhichNode;
@@ -62,15 +90,15 @@ void LinkedList::AddNode( int value )
 		LPNODE lpWhichNode = m_lpHeadNode;
 
 		// Loop through all nodes
-		while( lpWhichNode->m_lpNextNode != NULL )
+		while( lpWhichNode->GetNextNode() != NULL )
 		{
 			// Get next node
-			lpWhichNode = lpWhichNode->m_lpNextNode;
+			lpWhichNode = lpWhichNode->GetNextNode();
 
 		}; // End of loop through all nodes
 
 		// Add new node to end of list
-		lpWhichNode->m_lpNextNode = lpNewNode;
+		lpWhichNode->SetNextNode( lpNewNode );
 
 	} // End of list is not empty
 
@@ -90,7 +118,7 @@ void LinkedList::DeleteNode( LPARAM lIdentifier )
 		// List is not empty
 
 		// See if head node has the required identifier
-		if( m_lpHeadNode->m_lIdentifier == lIdentifier )
+		if( m_lpHeadNode->GetIdentifier() == lIdentifier )
 		{
 			// Head node has the required identifier
 
@@ -98,7 +126,7 @@ void LinkedList::DeleteNode( LPARAM lIdentifier )
 			LPNODE lpTempNode = m_lpHeadNode;
 
 			// Move head node to next item
-			m_lpHeadNode = m_lpHeadNode->m_lpNextNode;
+			m_lpHeadNode = m_lpHeadNode->GetNextNode();
 
 			// Free memory
 			delete lpTempNode;
@@ -112,25 +140,25 @@ void LinkedList::DeleteNode( LPARAM lIdentifier )
 			LPNODE lpTempNode = m_lpHeadNode;
 
 			// Find node to delete
-			while( lpTempNode->m_lpNextNode && lpTempNode->m_lpNextNode->m_lIdentifier != lIdentifier )
+			while( lpTempNode->GetNextNode() && lpTempNode->GetNextNode()->GetIdentifier() != lIdentifier )
 			{
 				// Get next node
-				lpTempNode = lpTempNode->m_lpNextNode;
+				lpTempNode = lpTempNode->GetNextNode();
 
 			}; // End of loop to find node to delete
 
 			// Note that temp node is the node before the one to delete
 
 			// Ensure that node to delete was found
-			if( lpTempNode->m_lpNextNode )
+			if( lpTempNode->GetNextNode() )
 			{
 				// Successfully found node to delete
 
 				// Store node to delete
-				LPNODE lpNodeToDelete = lpTempNode->m_lpNextNode;
+				LPNODE lpNodeToDelete = lpTempNode->GetNextNode();
 
 				// Unlink node
-				lpTempNode->m_lpNextNode = lpTempNode->m_lpNextNode->m_lpNextNode;
+				lpTempNode->SetNextNode( lpTempNode->GetNextNode()->GetNextNode() );
 
 				// Free memory of deleted node
 				delete lpNodeToDelete;
@@ -155,10 +183,10 @@ void LinkedList::Display()
 	while( lpWhichNode != NULL )
 	{
 		// Print node
-		printf( "Node %lld, data %d\r\n", lpWhichNode->m_lIdentifier, lpWhichNode->m_nData );
+		printf( "Node %lld, data %d\r\n", lpWhichNode->GetIdentifier(), lpWhichNode->GetData() );
 
 		// Get next node
-		lpWhichNode = lpWhichNode->m_lpNextNode;
+		lpWhichNode = lpWhichNode->GetNextNode();
 
 	} // End of loop through all nodes
 
@@ -181,7 +209,7 @@ LPNODE LinkedList::GetNode( LPARAM lIdentifier )
 	while( lpWhichNode )
 	{
 		// See if this is the required node
-		if( lpWhichNode->m_lIdentifier == lIdentifier )
+		if( lpWhichNode->GetIdentifier() == lIdentifier )
 		{
 			// This is the required node
 
@@ -197,7 +225,7 @@ LPNODE LinkedList::GetNode( LPARAM lIdentifier )
 			// This is not the required node
 
 			// Get next node
-			lpWhichNode = lpWhichNode->m_lpNextNode;
+			lpWhichNode = lpWhichNode->GetNextNode();
 
 		} // End of this is not the required node
 
@@ -222,7 +250,7 @@ int LinkedList::Integer( LPARAM lIdentifier )
 		// Successfully got node
 
 		// Update return value
-		nResult = lpNode->m_nData;
+		nResult = lpNode->GetData();
 
 	} // End of successfully got node
 
